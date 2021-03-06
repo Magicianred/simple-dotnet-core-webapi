@@ -102,3 +102,6 @@ dist
 
 # TernJS port file
 .tern-port
+/base/simple-dotnet-core-webapi/.vs/simple-dotnet-core-webapi
+/base/simple-dotnet-core-webapi/simple-dotnet-core-webapi/bin/Debug/netcoreapp3.1
+/base/simple-dotnet-core-webapi/simple-dotnet-core-webapi/obj
