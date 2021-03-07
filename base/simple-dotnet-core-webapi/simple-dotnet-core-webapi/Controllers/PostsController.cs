@@ -46,7 +46,7 @@ namespace simple_dotnet_core_webapi.Controllers
                                 .Build();
 
             // create some delay to simulate bad performance
-            BadPerformance.MakeDelay(10, 100, size);
+            BadPerformance.MakeDelay(10, 20, size);
 
             return await Task.FromResult(items.Skip(page * size));
         }

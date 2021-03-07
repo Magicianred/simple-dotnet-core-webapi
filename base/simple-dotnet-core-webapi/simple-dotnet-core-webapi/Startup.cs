@@ -41,11 +41,14 @@ namespace simple_dotnet_core_webapi
 
             app.UseRouting();
 
-            app.UseAuthorization();
+            // global cors policy
+            app.UseCors(x => x
+                .AllowAnyMethod()
+                .AllowAnyHeader()
+                .SetIsOriginAllowed(origin => true) // allow any origin
+                .AllowCredentials()); // allow credentials
 
-            app.UseCors(
-                options => options.WithOrigins("http://localhost:8080").AllowAnyMethod()
-            );
+            app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>
             {
