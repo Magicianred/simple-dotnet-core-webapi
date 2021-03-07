@@ -2,14 +2,18 @@
 using FizzWare.NBuilder;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using simple_dotnet_core_webapi.Utils;
+using simple_dotnet_core_webapi.ViewModels;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading;
 using System.Threading.Tasks;
 
 namespace simple_dotnet_core_webapi.Controllers
 {
+    /// <summary>
+    /// Handle Posts
+    /// </summary>
     [ApiController]
     [Route("api/[controller]")]
     public class PostsController : ControllerBase
@@ -21,23 +25,51 @@ namespace simple_dotnet_core_webapi.Controllers
             _logger = logger;
         }
 
+        /// <summary>
+        /// Retrieve some post for simulation
+        /// </summary>
+        /// <param name="page">Fake parameter with generated data</param>
+        /// <param name="size">How for page</param>
+        /// <returns>List of posts</returns>
         [HttpGet]
-        public async Task<IEnumerable<Post>> Get()
+        public async Task<IEnumerable<ShortPost>> Get(int page = 0, int size = 100)
         {
-            var posts = Builder<Post>
-                                .CreateListOfSize(10)
+            var items = Builder<ShortPost>
+                                .CreateListOfSize(size)
                                 .All()
-                                    .With(c => c.Title = Faker.Number.Number(2))
-                                    .With(c => c.Title = Faker.Food.Dish())
-                                    .With(c => c.Text = Faker.Food.Description())
-                                    .With(c => c.CreateDate = Faker.Date.Backward())
+                                    .With(i => i.Id = Guid.NewGuid())
+                                    .With(i => i.Title = Faker.Food.Dish())
+                                    .With(i => i.Abstract = Faker.Food.Description())
+                                    .With(i => i.CreateDate = Faker.Date.Backward())
+                                    .With(i => i.TagsCount = (int)Faker.Number.Between(1, 30))
+                                    .With(i => i.CategoriesCount = (int)Faker.Number.Between(1, 30))
                                 .Build();
 
-            Random r = new Random();
-            var delay = r.Next(10, 50) * 100;
-            Thread.Sleep(delay);
+            // create some delay to simulate bad performance
+            BadPerformance.MakeDelay(10, 100, size);
 
-            return await Task.FromResult(posts);
+            return await Task.FromResult(items.Skip(page * size));
+        }
+
+        [HttpGet]
+        [Route("{id}")]
+        public async Task<Post> Get(Guid id)
+        {
+            // Id is fake, create a new Post
+
+            var post = Builder<Post>
+                                .CreateNew()
+                                    .With(i => i.Title = Faker.Number.Number(2))
+                                    .With(i => i.Title = Faker.Food.Dish())
+                                    .With(i => i.Abstract = Faker.Food.Description())
+                                    .With(i => i.Text = String.Join(".\n\r", Faker.Lorem.Paragraphs(10)))
+                                    .With(i => i.CreateDate = Faker.Date.Backward())
+                                .Build();
+
+            // create some delay to simulate bad performance
+            BadPerformance.MakeDelay(10, 100, (int)Faker.Number.Between(20,40));
+
+            return await Task.FromResult(post);
         }
     }
 }
